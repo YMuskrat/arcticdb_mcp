@@ -11,7 +11,7 @@ def test_df_to_records_preserves_a_colliding_index_and_column() -> None:
 
     assert _df_to_records(frame) == [
         {
-            "date_index": pd.Timestamp("2024-01-01"),
+            "date_index": "2024-01-01 00:00:00",
             "date": "source-value",
             "price": 10,
         }
