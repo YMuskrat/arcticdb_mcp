@@ -24,6 +24,16 @@ ARCTICDB_URI=lmdb:///tmp/test_db npx @modelcontextprotocol/inspector python -m a
 
 ## Project Rules
 
+Run the full test suite (including pytest-style and unittest-style tests):
+
+```bash
+python -m pip install -e ".[dev]"
+python -m pytest -q
+```
+
+The pull-request workflow runs this command on Ubuntu with Python 3.12.
+Tests use mocks or temporary local storage and do not need cloud credentials.
+
 - Tool modules in `arcticdb_mcp/tools/` should contain tool functions only.
 - Helper logic should live in `arcticdb_mcp/utils/`.
 - Use `@register_tool("tool_name")` for every new tool.
