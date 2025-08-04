@@ -34,6 +34,12 @@ python -m pytest -q
 The pull-request workflow runs this command on Ubuntu with Python 3.12.
 Tests use mocks or temporary local storage and do not need cloud credentials.
 
+To check packaging, build in a clean `dist/` directory with `python -m build`,
+then run `python scripts/check_wheel.py`. The smoke check installs the wheel
+without dependencies into a temporary environment and checks package contents
+and the console entry point from outside the checkout. It does not start a server;
+the regular tests exercise runtime imports with dependencies installed.
+
 - Tool modules in `arcticdb_mcp/tools/` should contain tool functions only.
 - Helper logic should live in `arcticdb_mcp/utils/`.
 - Use `@register_tool("tool_name")` for every new tool.
