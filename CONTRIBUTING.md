@@ -2,6 +2,37 @@
 
 Thanks for contributing.
 
+## Choosing a contribution
+
+Start with the [open issues](https://github.com/YMuskrat/arcticdb_mcp/issues).
+Check linked pull requests and recent comments before starting, then leave a
+short note describing the change you want to make. If the scope is unclear,
+ask on the issue before investing in a large implementation.
+
+Useful contributions include bug reproductions, tests, documentation, and new
+tools. A reproduction should include a small synthetic dataset and exact tool
+arguments so another contributor can repeat it without private data.
+
+Keep each pull request focused on one outcome. Include the related issue,
+before/after behavior, commands you ran, and any checks you could not run.
+Use a draft pull request when you want feedback on an incomplete approach.
+
+## Finding the right code
+
+| Area | Starting point |
+|---|---|
+| Startup and MCP tool exposure | `arcticdb_mcp/main.py` |
+| Tool registration | `arcticdb_mcp/registry.py` |
+| Shared database connection | `arcticdb_mcp/connection.py` |
+| Tool parameters and backend calls | `arcticdb_mcp/tools/` |
+| Input conversion and output serialization | `arcticdb_mcp/utils/` |
+| Regression tests | `tests/` |
+
+For a tool change, check both its Python behavior and the schema visible in
+MCP Inspector. A direct function call alone does not verify client-side input
+validation. Exercise failures as well as the successful path, and keep test
+storage separate from databases you use for other work.
+
 ## Setup
 
 ```bash
