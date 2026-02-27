@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "arcticdb-mcp"
@@ -33,6 +33,3 @@ Issues = "https://github.com/YMuskrat/arcticdb-mcp/issues"
 [project.scripts]
 arcticdb-mcp = "arcticdb_mcp.main:main"
 
-[tool.setuptools]
-package-dir = {"arcticdb_mcp" = "."}
-packages = ["arcticdb_mcp", "arcticdb_mcp.tools"]
