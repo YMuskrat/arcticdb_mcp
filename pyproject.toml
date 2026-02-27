@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "arcticdb-mcp"
-version = "0.1.0"
+version = "0.1.1"
 description = "MCP server that gives AI assistants full read/write access to ArcticDB"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.9"
 authors = [
-    { name = "Yassir Laaouach", email = "" }
+    { name = "Yassir Laaouach" }
 ]
 keywords = ["arcticdb", "mcp", "llm", "ai", "dataframe", "timeseries", "claude"]
 classifiers = [

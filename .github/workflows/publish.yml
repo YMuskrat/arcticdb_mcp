@@ -21,8 +21,6 @@ jobs:
       - run: python -m build
 
       - uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
 
   docker:
     name: Publish to Docker Hub
