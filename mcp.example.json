@@ -1,15 +1,41 @@
 {
-    "mcpServers": {
-        "arcticdb": {
-            "command": "python",
-            "args": [
-                "-m",
-                "arcticdb_mcp"
-            ],
-            "env": {
-                "ARCTICDB_URI": "lmdb:///path/to/your/database",
-            "_windows_note": "On Windows use two slashes with a drive letter: lmdb://C:/path/to/your/database"
-            }
-        }
+  "mcpServers": {
+    "arcticdb-pip": {
+      "command": "python",
+      "args": ["-m", "arcticdb_mcp"],
+      "env": {
+        "ARCTICDB_URI": "lmdb:///path/to/your/database",
+        "_windows_note": "On Windows use two slashes: lmdb://C:/path/to/your/database"
+      }
+    },
+    "arcticdb-uvx": {
+      "command": "uvx",
+      "args": ["arcticdb-mcp"],
+      "env": {
+        "ARCTICDB_URI": "lmdb:///path/to/your/database"
+      }
+    },
+    "arcticdb-uv": {
+      "command": "uv",
+      "args": ["run", "arcticdb-mcp"],
+      "env": {
+        "ARCTICDB_URI": "lmdb:///path/to/your/database"
+      }
+    },
+    "arcticdb-pipx": {
+      "command": "arcticdb-mcp",
+      "env": {
+        "ARCTICDB_URI": "lmdb:///path/to/your/database"
+      }
+    },
+    "arcticdb-docker": {
+      "command": "docker",
+      "args": [
+        "run", "--rm", "-i",
+        "-e", "ARCTICDB_URI=lmdb:///data/db",
+        "-v", "/path/to/your/database:/data/db",
+        "ymuskrat/arcticdb-mcp"
+      ]
     }
+  }
 }
