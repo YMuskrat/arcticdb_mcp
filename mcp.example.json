@@ -1,0 +1,15 @@
+{
+    "mcpServers": {
+        "arcticdb": {
+            "command": "python",
+            "args": [
+                "-m",
+                "arcticdb_mcp"
+            ],
+            "env": {
+                "ARCTICDB_URI": "lmdb:///path/to/your/database",
+            "_windows_note": "On Windows use two slashes with a drive letter: lmdb://C:/path/to/your/database"
+            }
+        }
+    }
+}
