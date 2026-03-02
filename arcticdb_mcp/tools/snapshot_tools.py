@@ -38,4 +38,4 @@ def read_symbol_from_snapshot(library: str, symbol: str, snapshot_name: str):
     Returns the symbol's data as a list of row records.
     """
     result = get_ac()[library].read(symbol, as_of=snapshot_name)
-    return result.data.to_dict(orient="records")
+    return result.data.reset_index().to_dict(orient="records")

@@ -14,6 +14,12 @@ def query_filter(library: str, symbol: str, filters: list):
      {"column": "volume", "op": "<", "value": 5000}]
     Supported ops: >, >=, <, <=, ==, !=
     """
+    if not filters:
+        raise ValueError(
+            "filters must contain at least one condition. "
+            "Example: [{'column': 'price', 'op': '>', 'value': 100}]"
+        )
+
     q = QueryBuilder()
     ops = {
         ">": lambda col, val: col > val,
@@ -25,6 +31,11 @@ def query_filter(library: str, symbol: str, filters: list):
     }
     expression = None
     for f in filters:
+        missing = [key for key in ("column", "op", "value") if key not in f]
+        if missing:
+            raise ValueError(
+                f"Each filter must include column/op/value. Missing: {missing}"
+            )
         col = q[f["column"]]
         op = f["op"]
         val = f["value"]
@@ -37,7 +48,7 @@ def query_filter(library: str, symbol: str, filters: list):
 
     q = q[expression]
     result = get_ac()[library].read(symbol, query_builder=q)
-    return result.data.to_dict(orient="records")
+    return result.data.reset_index().to_dict(orient="records")
 
 
 @register_tool("query_filter_isin")
@@ -49,7 +60,7 @@ def query_filter_isin(library: str, symbol: str, column: str, values: list):
     q = QueryBuilder()
     q = q[q[column].isin(values)]
     result = get_ac()[library].read(symbol, query_builder=q)
-    return result.data.to_dict(orient="records")
+    return result.data.reset_index().to_dict(orient="records")
 
 
 @register_tool("query_groupby")
@@ -62,7 +73,7 @@ def query_groupby(library: str, symbol: str, groupby_column: str, aggregations: 
     q = QueryBuilder()
     q = q.groupby(groupby_column).agg(aggregations)
     result = get_ac()[library].read(symbol, query_builder=q)
-    return result.data.to_dict(orient="records")
+    return result.data.reset_index().to_dict(orient="records")
 
 
 @register_tool("query_date_range")
@@ -75,7 +86,7 @@ def query_date_range(library: str, symbol: str, start: str, end: str):
         symbol,
         date_range=(pd.Timestamp(start), pd.Timestamp(end)),
     )
-    return result.data.to_dict(orient="records")
+    return result.data.reset_index().to_dict(orient="records")
 
 
 @register_tool("query_resample")
@@ -89,4 +100,4 @@ def query_resample(library: str, symbol: str, rule: str, aggregations: dict):
     q = QueryBuilder()
     q = q.resample(rule).agg(aggregations)
     result = get_ac()[library].read(symbol, query_builder=q)
-    return result.data.to_dict(orient="records")
+    return result.data.reset_index().to_dict(orient="records")
