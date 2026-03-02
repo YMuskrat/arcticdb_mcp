@@ -1,5 +1,6 @@
 import os
 import sys
+import inspect
 from pathlib import Path
 from fastmcp import FastMCP
 
@@ -20,10 +21,22 @@ for name, func in TOOL_REGISTRY.items():
     mcp.tool(name=name)(func)
 
 
+def _run_http_sse(port: int):
+    """
+    Run FastMCP in HTTP/SSE mode.
+    FastMCP 3.x requires transport="sse"; older versions accepted host/port directly.
+    """
+    run_sig = inspect.signature(type(mcp).run)
+    if "transport" in run_sig.parameters:
+        mcp.run(transport="sse", host="0.0.0.0", port=port)
+    else:
+        mcp.run(host="0.0.0.0", port=port)
+
+
 def main():
     port = os.getenv("ARCTICDB_MCP_PORT")
     if port:
-        mcp.run(host="0.0.0.0", port=int(port))
+        _run_http_sse(int(port))
     else:
         mcp.run()
 
