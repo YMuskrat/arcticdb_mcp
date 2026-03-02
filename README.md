@@ -18,7 +18,7 @@
 
 ## Overview
 
-`arcticdb-mcp` gives AI assistants structured access to [ArcticDB](https://github.com/man-group/ArcticDB) for versioned DataFrame workflows: symbol reads/writes, snapshots, metadata, query operations, and batch operations.
+`arcticdb-mcp` turns [ArcticDB](https://github.com/man-group/ArcticDB) into an AI data copilot. Assistants can automate symbol updates, batch jobs, and time-series queries while built-in versioning protects every change. Go from question to data change in minutes, not scripts, with full traceability. You can also design your own workflows on top of `arcticdb-mcp`.
 
 ## Table of Contents
 
