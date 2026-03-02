@@ -1,49 +1,36 @@
-# arcticdb-mcp
+﻿# arcticdb-mcp
 
-MCP server that gives AI assistants full read/write access to [ArcticDB](https://github.com/man-group/ArcticDB) — versioned, queryable, serverless DataFrames at scale.
+[![PyPI](https://img.shields.io/pypi/v/arcticdb-mcp.svg)](https://pypi.org/project/arcticdb-mcp/)
+[![Python](https://img.shields.io/pypi/pyversions/arcticdb-mcp.svg)](https://pypi.org/project/arcticdb-mcp/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-<!-- GIF DEMO HERE -->
+`arcticdb-mcp` is an MCP server that gives AI assistants structured read/write access to [ArcticDB](https://github.com/man-group/ArcticDB).
 
----
+It is built for assistant-driven data workflows on versioned DataFrame data: symbol reads/writes, snapshots, metadata, query operations, and batch operations.
 
-## Why ArcticDB + AI
+## Table of Contents
 
-Most databases give your AI assistant data. ArcticDB gives it **versioned** data — every write is a new version, every version is recoverable. This means your AI can:
+- [Quickstart](#quickstart)
+- [Demo Video](#demo-video)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Run Modes](#run-modes)
+- [Tools](#tools)
+- [Example Prompts](#example-prompts)
+- [Development](#development)
+- [Community Backlog](#community-backlog)
+- [Contributing](#contributing)
+- [License](#license)
 
-- Detect when a new data update introduced anomalies by comparing it to the previous version
-- Roll back to a known-good state without any data loss
-- Query billions of rows with date range, filter, and groupby — without loading them into memory
-- Work across LMDB (local), S3, Azure Blob, and MinIO with zero infrastructure changes
+## Quickstart
 
----
+1. Install and run with `uvx` (recommended):
 
-## Configure Your AI Assistant
+```bash
+uvx arcticdb-mcp
+```
 
-We provide full instructions for configuring arcticdb-mcp with Claude Desktop. Many MCP clients use a similar configuration file — you can adapt these steps to work with the client of your choice.
-
-> **Cursor / Windsurf / Continue.dev** — these all use the same JSON config format as Claude Desktop. Use any of the blocks below as-is.
-
-> **n8n / HTTP-based tools** — see [HTTP / SSE mode](#http--sse-mode-n8n-and-other-tools) below.
-
----
-
-### Claude Desktop configuration file location
-
-| OS | Path |
-|----|------|
-| macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
-| Windows | `%APPDATA%\Claude\claude_desktop_config.json` |
-| Linux | `~/.config/Claude/claude_desktop_config.json` |
-
-You can also use the **Settings** menu in Claude Desktop to locate the file.
-
-Edit the `mcpServers` section using one of the methods below.
-
----
-
-### If you are using uvx *(recommended)*
-
-No install step needed — `uvx` fetches and runs arcticdb-mcp directly from PyPI.
+2. Configure your MCP client (Claude Desktop / Cursor / Windsurf / Continue):
 
 ```json
 {
@@ -59,246 +46,194 @@ No install step needed — `uvx` fetches and runs arcticdb-mcp directly from PyP
 }
 ```
 
----
+3. Ask your assistant:
 
-### If you are using uv
+- "Show me the last 5 rows of AAPL in library finance"
+- "Create a snapshot of finance before I update symbols"
+- "List versions for symbol ES_intraday"
 
-```json
-{
-  "mcpServers": {
-    "arcticdb": {
-      "command": "uv",
-      "args": ["run", "arcticdb-mcp"],
-      "env": {
-        "ARCTICDB_URI": "lmdb:///path/to/your/database"
-      }
-    }
-  }
-}
-```
+## Demo Video
 
----
+Watch the live `watch db` demo:
 
-### If you are using pipx
+<p align="center">
+  <video src="demo/media/arcticdb-live-demo.mp4" controls muted playsinline width="100%"></video>
+</p>
+
+If inline playback does not render in your viewer, open the file directly:
+[`demo/media/arcticdb-live-demo.mp4`](demo/media/arcticdb-live-demo.mp4)
+
+## Installation
+
+Choose one:
 
 ```bash
+# Recommended
+uvx arcticdb-mcp
+
+# Or
 pipx install arcticdb-mcp
-```
 
-```json
-{
-  "mcpServers": {
-    "arcticdb": {
-      "command": "arcticdb-mcp",
-      "env": {
-        "ARCTICDB_URI": "lmdb:///path/to/your/database"
-      }
-    }
-  }
-}
-```
-
----
-
-### If you are using pip
-
-```bash
+# Or
 pip install arcticdb-mcp
 ```
 
-```json
-{
-  "mcpServers": {
-    "arcticdb": {
-      "command": "python",
-      "args": ["-m", "arcticdb_mcp"],
-      "env": {
-        "ARCTICDB_URI": "lmdb:///path/to/your/database"
-      }
-    }
-  }
-}
+Python requirement: `>=3.9`
+
+## Configuration
+
+Set `ARCTICDB_URI` in MCP client config or environment.
+
+### URI examples
+
+- Local LMDB (Linux/macOS): `lmdb:///path/to/db`
+- Local LMDB (Windows): `lmdb://C:/path/to/db`
+- AWS S3: `s3://s3.amazonaws.com:bucket?region=us-east-1&access=KEY&secret=SECRET`
+- Azure Blob: `azure://AccountName=X;AccountKey=Y;Container=Z`
+- S3-compatible (MinIO, etc.): `s3://your-endpoint:bucket?access=KEY&secret=SECRET`
+
+You can also use a `.env` file:
+
+```env
+ARCTICDB_URI=lmdb:///path/to/db
 ```
 
----
+## Run Modes
 
-### If you are using Docker
+### stdio (default)
 
-**Local LMDB** — mount your database directory as a volume:
-
-```json
-{
-  "mcpServers": {
-    "arcticdb": {
-      "command": "docker",
-      "args": [
-        "run", "--rm", "-i",
-        "-e", "ARCTICDB_URI=lmdb:///data/db",
-        "-v", "/path/to/your/database:/data/db",
-        "ymuskrat/arcticdb-mcp"
-      ]
-    }
-  }
-}
-```
-
-**S3 / Azure** — no volume needed, pass credentials via env:
-
-```json
-{
-  "mcpServers": {
-    "arcticdb": {
-      "command": "docker",
-      "args": ["run", "--rm", "-i", "ymuskrat/arcticdb-mcp"],
-      "env": {
-        "ARCTICDB_URI": "s3://s3.amazonaws.com:bucket?region=us-east-1&access=KEY&secret=SECRET"
-      }
-    }
-  }
-}
-```
-
-Build the image locally:
+This is the default mode used by desktop MCP clients.
 
 ```bash
-docker build -t arcticdb-mcp .
+ARCTICDB_URI=lmdb:///path/to/db python -m arcticdb_mcp
 ```
 
----
+### HTTP / SSE
 
-### ArcticDB URI
-
-Replace `lmdb:///path/to/your/database` with your ArcticDB connection URI:
-
-| Backend | URI format |
-|---------|-----------|
-| Local (LMDB) | `lmdb:///path/to/db` (Linux/Mac) · `lmdb://C:/path/to/db` (Windows) |
-| AWS S3 | `s3://s3.amazonaws.com:bucket?region=us-east-1&access=KEY&secret=SECRET` |
-| Azure Blob | `azure://AccountName=X;AccountKey=Y;Container=Z` |
-| MinIO / S3-compatible | `s3://your-endpoint:bucket?access=KEY&secret=SECRET` |
-
-You can also set the URI in a `.env` file in your working directory instead of the config.
-
----
-
-**Then ask your AI assistant:**
-
-```
-"Show me the last 5 rows of AAPL in the finance library"
-"Filter NVDA prices greater than 500 in 2024"
-"Compare the latest version of this symbol to the previous one"
-"Create a snapshot of the finance library before I update it"
-```
-
----
-
-## Backends
-
-| Backend | URI format |
-|---------|-----------|
-| Local (LMDB) | `lmdb:///path/to/db` (Linux/Mac) · `lmdb://C:/path/to/db` (Windows) |
-| AWS S3 | `s3://s3.amazonaws.com:bucket?region=us-east-1&access=KEY&secret=SECRET` |
-| Azure Blob | `azure://AccountName=X;AccountKey=Y;Container=Z` |
-| MinIO / S3-compatible | `s3://your-endpoint:bucket?access=KEY&secret=SECRET` |
-
-Set the URI via environment variable:
+Set `ARCTICDB_MCP_PORT` to run over HTTP/SSE:
 
 ```bash
-export ARCTICDB_URI="lmdb:///path/to/your/database"
+ARCTICDB_URI=lmdb:///path/to/db ARCTICDB_MCP_PORT=8000 python -m arcticdb_mcp
 ```
 
-Or use a `.env` file in your working directory.
+Endpoint:
 
----
-
-## Tools
-
-### Libraries
-| Tool | Description |
-|------|-------------|
-| `list_libraries` | List all libraries in the Arctic instance |
-| `create_library` | Create a new library |
-| `delete_library` | Delete a library and all its data |
-| `library_exists` | Check whether a library exists |
-| `get_library` | Get a library's name and symbol list |
-
-### Symbols
-| Tool | Description |
-|------|-------------|
-| `list_symbols` | List all symbols in a library |
-| `read_symbol` | Read a symbol's full data. Use `as_of` for a specific version |
-| `head_symbol` | Read the first n rows of a symbol |
-| `tail_symbol` | Read the last n rows of a symbol |
-| `write_symbol` | Write data to a symbol, creating a new version |
-| `append_symbol` | Append rows to an existing symbol |
-| `update_symbol` | Overwrite a date range of a timeseries symbol |
-| `delete_symbol` | Delete a symbol and all its versions |
-| `delete_data_in_range` | Delete rows within a date range, creating a new version |
-| `symbol_exists` | Check whether a symbol exists |
-| `get_symbol_info` | Get row count, column names, and last update time |
-| `read_metadata` | Read a symbol's metadata without loading data |
-| `write_metadata` | Update a symbol's metadata |
-| `list_versions` | List all versions of a symbol with timestamps |
-
-### Snapshots
-| Tool | Description |
-|------|-------------|
-| `create_snapshot` | Snapshot the current state of a library |
-| `list_snapshots` | List all snapshots in a library |
-| `delete_snapshot` | Delete a named snapshot |
-| `read_symbol_from_snapshot` | Read a symbol as it existed at snapshot time |
-
-### Queries
-| Tool | Description |
-|------|-------------|
-| `query_filter` | Filter rows with `>`, `>=`, `<`, `<=`, `==`, `!=` conditions |
-| `query_filter_isin` | Filter rows where a column value is in a list |
-| `query_groupby` | Group by a column and aggregate (mean, sum, min, max, count) |
-| `query_date_range` | Filter a datetime-indexed symbol by date range |
-| `query_resample` | Resample a datetime-indexed symbol (1h, 1D, 1W, ...) |
-
----
-
-## HTTP / SSE mode (n8n and other tools)
-
-Tools like n8n, Zapier, or any custom application that can't launch a local process need the server running as an HTTP service. Set `ARCTICDB_MCP_PORT` to switch from stdio to SSE transport:
-
-```bash
-ARCTICDB_URI=lmdb:///path/to/your/database ARCTICDB_MCP_PORT=8000 python -m arcticdb_mcp
-```
-
-The MCP endpoint will be available at:
-
-```
+```text
 http://localhost:8000/sse
 ```
 
-**With Docker:**
+## Tools
 
-```bash
-docker run -d \
-  -e ARCTICDB_URI=lmdb:///data/db \
-  -e ARCTICDB_MCP_PORT=8000 \
-  -v /path/to/your/database:/data/db \
-  -p 8000:8000 \
-  ymuskrat/arcticdb-mcp
-```
+Current server exposes 47 tools.
 
-**In n8n** — add an MCP Client node and point it to `http://your-host:8000/sse`.
+### Arctic and Libraries
 
----
+- `get_uri`
+- `list_libraries`
+- `create_library`
+- `delete_library`
+- `library_exists`
+- `get_library`
+- `modify_library_option`
+- `get_library_options`
+- `get_enterprise_options`
+
+### Symbols
+
+- `list_symbols`
+- `symbol_exists`
+- `read_symbol`
+- `head_symbol`
+- `tail_symbol`
+- `write_symbol`
+- `append_symbol`
+- `update_symbol`
+- `delete_symbol`
+- `delete_data_in_range`
+- `get_symbol_info`
+- `list_versions`
+- `read_metadata`
+- `write_metadata`
+
+### Batch Operations
+
+- `write_batch`
+- `append_batch`
+- `update_batch`
+- `delete_batch`
+- `read_batch`
+- `read_metadata_batch`
+- `get_description_batch`
+- `write_metadata_batch`
+- `write_pickle`
+- `write_pickle_batch`
+
+### Snapshots
+
+- `create_snapshot`
+- `list_snapshots`
+- `delete_snapshot`
+- `read_symbol_from_snapshot`
+
+### Query Helpers
+
+- `query_filter`
+- `query_filter_isin`
+- `query_groupby`
+- `query_date_range`
+- `query_resample`
+
+### Maintenance
+
+- `reload_symbol_list`
+- `compact_symbol_list`
+- `is_symbol_fragmented`
+- `defragment_symbol_data`
+- `prune_previous_versions`
+
+## Example Prompts
+
+- "Read symbol NVDA from library finance"
+- "Filter NVDA where price > 500 and volume >= 1000"
+- "Resample ES_intraday to 5min and aggregate price mean, volume sum"
+- "Write metadata owner=research to symbol ES_intraday"
+- "Delete data in range for ES_intraday from 2024-01-01 to 2024-01-05"
 
 ## Development
 
 ```bash
 git clone https://github.com/YMuskrat/arcticdb-mcp
-pip install -e ".[dev]"
+cd arcticdb-mcp
+pip install -e .
+```
 
-# Test with MCP Inspector
+Run locally:
+
+```bash
+ARCTICDB_URI=lmdb:///path/to/db python -m arcticdb_mcp
+```
+
+Test with MCP Inspector:
+
+```bash
 ARCTICDB_URI=lmdb:///tmp/test_db npx @modelcontextprotocol/inspector python -m arcticdb_mcp
 ```
 
----
+## Community Backlog
+
+These ArcticDB capabilities are intentionally left open for contributors:
+
+- `stage`
+- `finalize_staged_data`
+- `sort_and_finalize_staged_data`
+- `delete_staged_data`
+- `get_staged_symbols`
+- `read_batch_and_join`
+- `admin_tools`
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
