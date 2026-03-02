@@ -5,9 +5,12 @@ __pycache__/
 dist/
 build/
 .eggs/
+pip-wheel-metadata/
 
 # Environment
 .env
+.env.*
+!.env.example
 .venv/
 env/
 venv/
@@ -20,6 +23,29 @@ venv/
 # Claude
 .claude/
 
+# Test and tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+.tox/
+.nox/
+
+# Coverage artifacts
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
 # ArcticDB local data
 arcticdb_data/
 lmdb_data/
+
+# Demo scripts
+demo/**/*.py
+
+# Logs and OS clutter
+*.log
+.DS_Store
+Thumbs.db
