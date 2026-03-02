@@ -1,6 +1,6 @@
-# Contributing to arcticdb-mcp
+﻿# Contributing to arcticdb-mcp
 
-Contributions are welcome — bug fixes, new tools, documentation improvements, and backend-specific testing are all valuable.
+Thanks for contributing.
 
 ## Setup
 
@@ -10,50 +10,71 @@ cd arcticdb-mcp
 pip install -e .
 ```
 
-Test your changes with the MCP Inspector:
+Run server locally:
+
+```bash
+ARCTICDB_URI=lmdb:///tmp/test_db python -m arcticdb_mcp
+```
+
+Open MCP Inspector:
 
 ```bash
 ARCTICDB_URI=lmdb:///tmp/test_db npx @modelcontextprotocol/inspector python -m arcticdb_mcp
 ```
 
-## Adding a new tool
+## Project Rules
 
-The pattern is intentionally simple. Pick the right file under `tools/` (or create a new one for a new category), add a function with the `@register_tool` decorator:
+- Tool modules in `arcticdb_mcp/tools/` should contain tool functions only.
+- Helper logic should live in `arcticdb_mcp/utils/`.
+- Use `@register_tool("tool_name")` for every new tool.
+- Use explicit typed parameters (avoid dynamic `**kwargs` schemas).
+- Return JSON-serializable responses only.
+- Reuse `get_ac()` from `connection.py` (do not instantiate `Arctic` directly inside tools).
+
+## Adding a New Tool
+
+1. Pick the right file under `arcticdb_mcp/tools/`.
+2. Implement a focused tool function with a clear docstring.
+3. Move parsing/transformation helpers to `arcticdb_mcp/utils/`.
+4. If you add a new tools module, import it in `arcticdb_mcp/tools/__init__.py`.
+5. Validate in MCP Inspector before opening the PR.
+
+Example:
 
 ```python
 @register_tool("your_tool_name")
 def your_tool_name(library: str, symbol: str):
-    """
-    Clear description of what this tool does.
-    This is what the AI reads to decide when to call it — make it specific.
-    """
-    result = get_ac()[library].some_arcticdb_method(symbol)
-    return result
+    """Describe exactly what this tool does and when to use it."""
+    lib = get_ac()[library]
+    return lib.list_symbols() if symbol == "*" else lib.read(symbol).data.to_dict(orient="records")
 ```
 
-Rules:
-- No `**kwargs` — FastMCP needs explicit typed parameters to build the tool schema
-- Every tool must have a docstring
-- Return JSON-serialisable values (dicts, lists, strings, numbers, bools)
-- Use `get_ac()` for the connection — never instantiate `Arctic` directly
+## Community Contribution Backlog
 
-If you add a new file under `tools/`, import it in `tools/__init__.py`:
+These are intentionally left open for community implementation:
 
-```python
-from . import your_new_module
-```
+- `stage`
+- `finalize_staged_data`
+- `sort_and_finalize_staged_data`
+- `delete_staged_data`
+- `get_staged_symbols`
+- `read_batch_and_join`
+- `admin_tools`
 
-## Submitting a PR
+If you pick one, open an issue first so work does not overlap.
 
-1. Fork the repo and create a branch from `main`
-2. Make your changes
-3. Verify all existing tools still appear correctly in the Inspector
-4. Open a PR with a clear description of what you added and why
+## PR Checklist
 
-## Reporting bugs
+- Keep behavior backward compatible unless change is intentional and documented.
+- Add or update docs (`README.md`, docstrings) as needed.
+- Confirm tools load and run in MCP Inspector.
+- Include a concise PR description with scope and test notes.
 
-Use the bug report issue template. Include the ArcticDB backend you are using (LMDB, S3, Azure), your OS, and the full error message.
+## Reporting Bugs
 
-## Suggesting new tools
+Please include:
 
-Open a feature request issue. Check the [ArcticDB Library API](https://docs.arcticdb.io/latest/api/library/) first — if the method exists there, it can likely become a tool.
+- ArcticDB backend (`LMDB`, `S3`, `Azure`, etc.)
+- OS and Python version
+- Full error message and stack trace
+- Minimal reproduction steps
