@@ -38,13 +38,9 @@
 
 Watch the live `watch db` demo:
 
-<p align="center">
-  <a href="demo/media/arcticdb-live-demo.mp4">
-    <img src="demo/media/arcticdb-live-demo-preview.gif" alt="ArcticDB live demo preview" width="100%" />
-  </a>
-</p>
+https://raw.githubusercontent.com/YMuskrat/arcticdb-mcp/main/demo/media/arcticdb-live-demo.mp4
 
-Click the preview to open the full video:  
+If your viewer does not render the inline player, open the file directly:  
 [`demo/media/arcticdb-live-demo.mp4`](demo/media/arcticdb-live-demo.mp4)
 
 ## Quickstart

@@ -51,15 +51,17 @@ def your_tool_name(library: str, symbol: str):
 
 ## Community Contribution Backlog
 
-These are intentionally left open for community implementation:
+The following ArcticDB capabilities are not implemented as MCP tools yet and are open for community contributions.
 
-- `stage`
-- `finalize_staged_data`
-- `sort_and_finalize_staged_data`
-- `delete_staged_data`
-- `get_staged_symbols`
-- `read_batch_and_join`
-- `admin_tools`
+| Proposed MCP Tool | ArcticDB API | Suggested Module | Scope |
+|---|---|---|---|
+| `stage` | `Library.stage` | `arcticdb_mcp/tools/batch_tools.py` | Stage one or more payloads without finalizing versions. |
+| `finalize_staged_data` | `Library.finalize_staged_data` | `arcticdb_mcp/tools/batch_tools.py` | Finalize previously staged payloads for one symbol. |
+| `sort_and_finalize_staged_data` | `Library.sort_and_finalize_staged_data` | `arcticdb_mcp/tools/batch_tools.py` | Sort staged rows by index, then finalize safely. |
+| `delete_staged_data` | `Library.delete_staged_data` | `arcticdb_mcp/tools/batch_tools.py` | Delete staged (not yet finalized) data for a symbol. |
+| `get_staged_symbols` | `Library.get_staged_symbols` | `arcticdb_mcp/tools/batch_tools.py` | List symbols that currently have staged data. |
+| `read_batch_and_join` | `Library.read_batch_and_join` | `arcticdb_mcp/tools/batch_tools.py` | Join/query across multiple symbols in one server-side read. |
+| `admin_tools` | `Library.admin_tools` | `arcticdb_mcp/tools/maintenance_tools.py` | Expose safe, explicit admin operations with strict validation. |
 
 If you pick one, open an issue first so work does not overlap.
 
