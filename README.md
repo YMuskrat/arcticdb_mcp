@@ -38,10 +38,7 @@
 
 Watch the live `watch db` demo:
 
-https://raw.githubusercontent.com/YMuskrat/arcticdb-mcp/main/demo/media/arcticdb-live-demo.mp4
-
-If your viewer does not render the inline player, open the file directly:  
-[`demo/media/arcticdb-live-demo.mp4`](demo/media/arcticdb-live-demo.mp4)
+https://github.com/user-attachments/assets/dd81f229-e1f9-46e6-8e79-7c7252bc25c6
 
 ## Quickstart
 
@@ -261,3 +258,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## License
 
 MIT
+
