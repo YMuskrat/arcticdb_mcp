@@ -57,10 +57,12 @@ uvx arcticdb-mcp
 Watch the live `watch db` demo:
 
 <p align="center">
-  <video src="demo/media/arcticdb-live-demo.mp4" controls muted playsinline width="100%"></video>
+  <a href="demo/media/arcticdb-live-demo.mp4">
+    <img src="demo/media/arcticdb-live-demo-preview.gif" alt="ArcticDB live demo preview" width="100%" />
+  </a>
 </p>
 
-If inline playback does not render in your viewer, open the file directly:
+Click the preview to open the full video:
 [`demo/media/arcticdb-live-demo.mp4`](demo/media/arcticdb-live-demo.mp4)
 
 ## Installation
