@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "arcticdb-mcp"
-version = "0.2.2"
+version = "0.2.3"
 description = "MCP server that gives AI assistants full read/write access to ArcticDB"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -21,9 +21,9 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-    "arcticdb",
-    "fastmcp",
-    "python-dotenv",
+    "arcticdb>=4.0",
+    "fastmcp>=2.0",
+    "python-dotenv>=1.0",
 ]
 
 [project.urls]

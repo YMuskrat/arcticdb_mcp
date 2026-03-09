@@ -4,8 +4,7 @@
       "command": "python",
       "args": ["-m", "arcticdb_mcp"],
       "env": {
-        "ARCTICDB_URI": "lmdb:///path/to/your/database",
-        "_windows_note": "On Windows use two slashes: lmdb://C:/path/to/your/database"
+        "ARCTICDB_URI": "lmdb:///path/to/your/database"
       }
     },
     "arcticdb-uvx": {
@@ -17,7 +16,7 @@
     },
     "arcticdb-uv": {
       "command": "uv",
-      "args": ["run", "arcticdb-mcp"],
+      "args": ["tool", "run", "arcticdb-mcp"],
       "env": {
         "ARCTICDB_URI": "lmdb:///path/to/your/database"
       }

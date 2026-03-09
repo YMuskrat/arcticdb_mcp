@@ -24,11 +24,18 @@ for name, func in TOOL_REGISTRY.items():
 def _run_http_sse(port: int):
     """
     Run FastMCP in HTTP/SSE mode.
-    FastMCP 3.x requires transport="sse"; older versions accepted host/port directly.
+    - fastmcp 3.x: run() uses **transport_kwargs; use transport="http"
+    - fastmcp 2.x: run() has explicit host/port params; use transport="sse"
+    - older: no transport param at all
     """
     run_sig = inspect.signature(type(mcp).run)
-    if "transport" in run_sig.parameters:
+    params = run_sig.parameters
+    if "host" in params:
+        # fastmcp 2.x — explicit host/port on run()
         mcp.run(transport="sse", host="0.0.0.0", port=port)
+    elif "transport" in params:
+        # fastmcp 3.x — host/port passed as transport_kwargs, transport="http"
+        mcp.run(transport="http", host="0.0.0.0", port=port)
     else:
         mcp.run(host="0.0.0.0", port=port)
 
