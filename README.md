@@ -213,6 +213,8 @@ Current server exposes 48 tools.
 
 ## Example Prompts
 
+For exact tool inputs, see the [query cookbook](docs/query-cookbook.md).
+
 - "Read symbol NVDA from library finance"
 - "Filter NVDA where price > 500 and volume >= 1000"
 - "Resample ES_intraday to 5min and aggregate price mean, volume sum"
