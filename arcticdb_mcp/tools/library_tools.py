@@ -24,7 +24,10 @@ def delete_library(name: str):
     Delete a library and all its underlying data permanently.
     No-op if the library does not exist.
     """
-    get_ac().delete_library(name)
+    ac = get_ac()
+    if not ac.has_library(name):
+        return f"Library '{name}' does not exist; nothing to delete."
+    ac.delete_library(name)
     return f"Library '{name}' deleted."
 
 
