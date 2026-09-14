@@ -71,7 +71,7 @@ def _infer_datetime_index(df: pd.DataFrame) -> pd.DataFrame:
 
 
 @register_tool("write_symbol")
-def write_symbol(library: str, symbol: str, data: list, metadata: dict = None):
+def write_symbol(library: str, symbol: str, data: list, metadata: Optional[dict] = None):
     """
     Write data to a symbol, creating a new version.
     data is a list of row records, where each record is a dict of column name to value.
