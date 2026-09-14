@@ -93,6 +93,7 @@ def append_symbol(library: str, symbol: str, data: list):
     data is a list of row records, where each record is a dict of column name to value.
     """
     df = pd.DataFrame(data)
+    df = _infer_datetime_index(df)
     get_ac()[library].append(symbol, df)
     return f"Appended {len(df)} rows to '{symbol}'."
 
