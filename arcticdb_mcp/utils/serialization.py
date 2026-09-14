@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from typing import Any
 
 import pandas as pd
@@ -7,17 +8,24 @@ import pandas as pd
 
 def normalize_value(value: Any) -> Any:
     """Convert ArcticDB/Pandas values to JSON-serializable Python values."""
-    if value is None or isinstance(value, (str, int, float, bool)):
+    if value is None or isinstance(value, (str, int, bool)):
         return value
 
-    if isinstance(value, pd.DataFrame):
-        return value.reset_index().to_dict(orient="records")
-
-    if isinstance(value, pd.Series):
-        return value.to_dict()
+    if isinstance(value, float):
+        return value if math.isfinite(value) else None
 
     if isinstance(value, (pd.Timestamp, pd.Timedelta)):
         return str(value)
+
+    if isinstance(value, pd.DataFrame):
+        records = value.reset_index().to_dict(orient="records")
+        return [
+            {str(key): normalize_value(item) for key, item in record.items()}
+            for record in records
+        ]
+
+    if isinstance(value, pd.Series):
+        return {str(key): normalize_value(item) for key, item in value.items()}
 
     if isinstance(value, dict):
         return {str(k): normalize_value(v) for k, v in value.items()}
@@ -27,7 +35,7 @@ def normalize_value(value: Any) -> Any:
 
     if hasattr(value, "item"):
         try:
-            return value.item()
+            return normalize_value(value.item())
         except Exception:
             pass
 
