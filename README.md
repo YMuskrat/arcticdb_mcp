@@ -214,6 +214,7 @@ Current server exposes 48 tools.
 ## Example Prompts
 
 For exact tool inputs, see the [query cookbook](docs/query-cookbook.md).
+For multi-symbol requests, see [batch tool arguments](docs/batch-operations.md).
 
 - "Read symbol NVDA from library finance"
 - "Filter NVDA where price > 500 and volume >= 1000"
