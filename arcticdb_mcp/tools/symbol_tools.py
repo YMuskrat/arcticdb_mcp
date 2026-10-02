@@ -142,7 +142,10 @@ def delete_symbol(library: str, symbol: str):
     Delete a symbol and all its versions from the library.
     No-op if the symbol does not exist.
     """
-    get_ac()[library].delete(symbol)
+    lib = get_ac()[library]
+    if not lib.has_symbol(symbol):
+        return f"Symbol '{symbol}' does not exist; nothing to delete."
+    lib.delete(symbol)
     return f"Deleted '{symbol}'."
 
 
