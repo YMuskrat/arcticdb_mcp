@@ -1,5 +1,6 @@
 from ..registry import register_tool
 from ..connection import get_ac
+from .symbol_tools import _df_to_records
 
 
 @register_tool("create_snapshot")
@@ -38,4 +39,4 @@ def read_symbol_from_snapshot(library: str, symbol: str, snapshot_name: str):
     Returns the symbol's data as a list of row records.
     """
     result = get_ac()[library].read(symbol, as_of=snapshot_name)
-    return result.data.reset_index().to_dict(orient="records")
+    return _df_to_records(result.data)

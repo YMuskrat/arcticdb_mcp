@@ -14,7 +14,25 @@ def list_symbols(library: str):
 
 def _df_to_records(df: pd.DataFrame) -> list:
     """Serialize a DataFrame to records, always including the index as a column."""
-    return df.reset_index().to_dict(orient="records")
+    frame = df.copy()
+    used_names = set(frame.columns)
+    index_names: list[object] = []
+    for level, name in enumerate(frame.index.names):
+        candidate = name
+        if candidate is None:
+            candidate = "index" if frame.index.nlevels == 1 else f"level_{level}"
+        if candidate in used_names or candidate in index_names:
+            base = f"{candidate}_index"
+            candidate = base
+            suffix = 2
+            while candidate in used_names or candidate in index_names:
+                candidate = f"{base}_{suffix}"
+                suffix += 1
+        index_names.append(candidate)
+        used_names.add(candidate)
+
+    frame.index = frame.index.set_names(index_names)
+    return frame.reset_index().to_dict(orient="records")
 
 
 @register_tool("read_symbol")
