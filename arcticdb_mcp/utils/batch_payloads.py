@@ -54,16 +54,17 @@ def build_write_payload(payload: dict, for_pickle: bool = False) -> WritePayload
     metadata = payload.get("metadata")
     index_column = payload.get("index_column")
 
-    if (
-        not for_pickle
-        and index_column
-        and isinstance(data, pd.DataFrame)
-        and index_column in data.columns
-    ):
+    if not for_pickle and index_column:
+        if not isinstance(data, pd.DataFrame) or index_column not in data.columns:
+            raise ValueError(f"index_column '{index_column}' is missing from data.")
+
         data = data.copy()
         converted = pd.to_datetime(data[index_column], errors="coerce")
-        if not converted.isna().any():
-            data[index_column] = converted
+        if converted.isna().any():
+            raise ValueError(
+                f"index_column '{index_column}' contains invalid datetime values."
+            )
+        data[index_column] = converted
         data = data.set_index(index_column)
 
     # Index is set explicitly above when index_column is provided.
