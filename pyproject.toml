@@ -30,6 +30,9 @@ dependencies = [
 Homepage = "https://github.com/YMuskrat/arcticdb-mcp"
 Issues = "https://github.com/YMuskrat/arcticdb-mcp/issues"
 
+[project.optional-dependencies]
+dev = ["pytest>=8", "build>=1"]
+
 [project.scripts]
 arcticdb-mcp = "arcticdb_mcp.main:main"
 

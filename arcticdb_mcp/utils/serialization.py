@@ -8,6 +8,9 @@ import pandas as pd
 
 def normalize_value(value: Any) -> Any:
     """Convert ArcticDB/Pandas values to JSON-serializable Python values."""
+    if value is pd.NA or value is pd.NaT:
+        return None
+
     if value is None or isinstance(value, (str, int, bool)):
         return value
 
@@ -18,11 +21,7 @@ def normalize_value(value: Any) -> Any:
         return str(value)
 
     if isinstance(value, pd.DataFrame):
-        records = value.reset_index().to_dict(orient="records")
-        return [
-            {str(key): normalize_value(item) for key, item in record.items()}
-            for record in records
-        ]
+        return dataframe_to_records(value)
 
     if isinstance(value, pd.Series):
         return {str(key): normalize_value(item) for key, item in value.items()}
@@ -118,4 +117,28 @@ def serialize_batch_entry(entry: Any, include_data: bool = False) -> Any:
         return serialize_symbol_description(entry)
 
     return normalize_value(entry)
+
+
+
+def dataframe_to_records(df: pd.DataFrame) -> list:
+    """Serialize a DataFrame to records, always including the index as a column."""
+    frame = df.copy()
+    used_names = set(frame.columns)
+    index_names: list[object] = []
+    for level, name in enumerate(frame.index.names):
+        candidate = name
+        if candidate is None:
+            candidate = "index" if frame.index.nlevels == 1 else f"level_{level}"
+        if candidate in used_names or candidate in index_names:
+            base = f"{candidate}_index"
+            candidate = base
+            suffix = 2
+            while candidate in used_names or candidate in index_names:
+                candidate = f"{base}_{suffix}"
+                suffix += 1
+        index_names.append(candidate)
+        used_names.add(candidate)
+
+    frame.index = frame.index.set_names(index_names)
+    return normalize_value(frame.reset_index().to_dict(orient="records"))
 

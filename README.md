@@ -119,6 +119,8 @@ ARCTICDB_URI=lmdb:///path/to/db python -m arcticdb_mcp
 
 Set `ARCTICDB_MCP_PORT` to run over HTTP/SSE:
 
+Use an integer from `1` to `65535`. An unset or empty value selects stdio.
+
 ```bash
 ARCTICDB_URI=lmdb:///path/to/db ARCTICDB_MCP_PORT=8000 python -m arcticdb_mcp
 ```

@@ -1,6 +1,7 @@
 import pandas as pd
 from arcticdb import QueryBuilder
 
+from ..utils.serialization import dataframe_to_records
 from ..registry import register_tool
 from ..connection import get_ac
 
@@ -48,7 +49,7 @@ def query_filter(library: str, symbol: str, filters: list):
 
     q = q[expression]
     result = get_ac()[library].read(symbol, query_builder=q)
-    return result.data.reset_index().to_dict(orient="records")
+    return dataframe_to_records(result.data)
 
 
 @register_tool("query_filter_isin")
@@ -60,7 +61,7 @@ def query_filter_isin(library: str, symbol: str, column: str, values: list):
     q = QueryBuilder()
     q = q[q[column].isin(values)]
     result = get_ac()[library].read(symbol, query_builder=q)
-    return result.data.reset_index().to_dict(orient="records")
+    return dataframe_to_records(result.data)
 
 
 @register_tool("query_groupby")
@@ -73,7 +74,7 @@ def query_groupby(library: str, symbol: str, groupby_column: str, aggregations: 
     q = QueryBuilder()
     q = q.groupby(groupby_column).agg(aggregations)
     result = get_ac()[library].read(symbol, query_builder=q)
-    return result.data.reset_index().to_dict(orient="records")
+    return dataframe_to_records(result.data)
 
 
 @register_tool("query_date_range")
@@ -86,7 +87,7 @@ def query_date_range(library: str, symbol: str, start: str, end: str):
         symbol,
         date_range=(pd.Timestamp(start), pd.Timestamp(end)),
     )
-    return result.data.reset_index().to_dict(orient="records")
+    return dataframe_to_records(result.data)
 
 
 @register_tool("query_resample")
@@ -100,4 +101,4 @@ def query_resample(library: str, symbol: str, rule: str, aggregations: dict):
     q = QueryBuilder()
     q = q.resample(rule).agg(aggregations)
     result = get_ac()[library].read(symbol, query_builder=q)
-    return result.data.reset_index().to_dict(orient="records")
+    return dataframe_to_records(result.data)

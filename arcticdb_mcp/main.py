@@ -40,7 +40,13 @@ def _run_http_sse(port: int):
 def main():
     port = os.getenv("ARCTICDB_MCP_PORT")
     if port:
-        _run_http_sse(int(port))
+        try:
+            parsed_port = int(port)
+        except ValueError:
+            raise ValueError("ARCTICDB_MCP_PORT must be an integer from 1 to 65535.") from None
+        if not 1 <= parsed_port <= 65535:
+            raise ValueError("ARCTICDB_MCP_PORT must be an integer from 1 to 65535.")
+        _run_http_sse(parsed_port)
     else:
         mcp.run()
 
