@@ -27,8 +27,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/YMuskrat/arcticdb-mcp"
-Issues = "https://github.com/YMuskrat/arcticdb-mcp/issues"
+Homepage = "https://github.com/YMuskrat/arcticdb_mcp"
+Issues = "https://github.com/YMuskrat/arcticdb_mcp/issues"
 
 [project.scripts]
 arcticdb-mcp = "arcticdb_mcp.main:main"
