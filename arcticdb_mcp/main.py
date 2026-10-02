@@ -26,7 +26,6 @@ def _run_http_sse(port: int):
     Run FastMCP in HTTP/SSE mode.
     - fastmcp 3.x: run() uses **transport_kwargs; use transport="http"
     - fastmcp 2.x: run() has explicit host/port params; use transport="sse"
-    - older: no transport param at all
     """
     run_sig = inspect.signature(type(mcp).run)
     params = run_sig.parameters
@@ -36,8 +35,6 @@ def _run_http_sse(port: int):
     elif "transport" in params:
         # fastmcp 3.x — host/port passed as transport_kwargs, transport="http"
         mcp.run(transport="http", host="0.0.0.0", port=port)
-    else:
-        mcp.run(host="0.0.0.0", port=port)
 
 
 def main():
