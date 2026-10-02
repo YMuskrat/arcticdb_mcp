@@ -1,3 +1,5 @@
+from typing import Optional
+
 from ..connection import get_ac
 from ..registry import register_tool
 from ..utils.arctic_options import parse_library_option
@@ -12,7 +14,7 @@ def get_uri():
 
 
 @register_tool("describe")
-def describe(library: str = None):
+def describe(library: Optional[str] = None):
     """
     Return a compact summary of the ArcticDB store.
 
