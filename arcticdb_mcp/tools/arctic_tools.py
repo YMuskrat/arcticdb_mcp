@@ -7,13 +7,13 @@ from ..utils.batch_payloads import build_read_info_request
 from ..utils.serialization import normalize_value, serialize_symbol_description
 
 
-@register_tool("get_uri")
+@register_tool("get_uri", read_only=True)
 def get_uri():
     """Return the ArcticDB URI used by this MCP server connection."""
     return get_ac().get_uri()
 
 
-@register_tool("describe")
+@register_tool("describe", read_only=True)
 def describe(library: Optional[str] = None):
     """
     Return a compact summary of the ArcticDB store.
@@ -63,7 +63,7 @@ def describe(library: Optional[str] = None):
     return result
 
 
-@register_tool("modify_library_option")
+@register_tool("modify_library_option", read_only=False)
 def modify_library_option(library: str, option: str, option_value):
     """
     Modify a configurable library option.

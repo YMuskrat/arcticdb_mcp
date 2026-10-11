@@ -3,7 +3,7 @@ from ..connection import get_ac
 from .symbol_tools import _df_to_records
 
 
-@register_tool("create_snapshot")
+@register_tool("create_snapshot", read_only=False)
 def create_snapshot(library: str, snapshot_name: str):
     """
     Create a named snapshot of the current library state.
@@ -15,13 +15,13 @@ def create_snapshot(library: str, snapshot_name: str):
     return f"Snapshot '{snapshot_name}' created in library '{library}'."
 
 
-@register_tool("list_snapshots")
+@register_tool("list_snapshots", read_only=True)
 def list_snapshots(library: str):
     """List the names of all snapshots in a library."""
     return list(get_ac()[library].list_snapshots().keys())
 
 
-@register_tool("delete_snapshot")
+@register_tool("delete_snapshot", read_only=False)
 def delete_snapshot(library: str, snapshot_name: str):
     """
     Delete a named snapshot from a library.
@@ -32,7 +32,7 @@ def delete_snapshot(library: str, snapshot_name: str):
     return f"Snapshot '{snapshot_name}' deleted from library '{library}'."
 
 
-@register_tool("read_symbol_from_snapshot")
+@register_tool("read_symbol_from_snapshot", read_only=True)
 def read_symbol_from_snapshot(library: str, symbol: str, snapshot_name: str):
     """
     Read a symbol as it existed at the time a named snapshot was created.

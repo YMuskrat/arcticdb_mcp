@@ -7,7 +7,7 @@ from ..connection import get_ac
 from ..utils.timeseries import rows_to_timeseries_update_frame
 
 
-@register_tool("list_symbols")
+@register_tool("list_symbols", read_only=True)
 def list_symbols(library: str):
     """List all symbol names stored in the given library."""
     return get_ac()[library].list_symbols()
@@ -16,7 +16,7 @@ def list_symbols(library: str):
 _df_to_records = dataframe_to_records
 
 
-@register_tool("read_symbol")
+@register_tool("read_symbol", read_only=True)
 def read_symbol(library: str, symbol: str, as_of: Optional[int] = None):
     """
     Read a symbol's full data as a list of row records, index included.
@@ -27,7 +27,7 @@ def read_symbol(library: str, symbol: str, as_of: Optional[int] = None):
     return _df_to_records(result.data)
 
 
-@register_tool("head_symbol")
+@register_tool("head_symbol", read_only=True)
 def head_symbol(library: str, symbol: str, n: int = 5):
     """
     Return the first n rows of a symbol (default 5), index included.
@@ -37,7 +37,7 @@ def head_symbol(library: str, symbol: str, n: int = 5):
     return _df_to_records(result.data)
 
 
-@register_tool("tail_symbol")
+@register_tool("tail_symbol", read_only=True)
 def tail_symbol(library: str, symbol: str, n: int = 5):
     """
     Return the last n rows of a symbol (default 5), index included.
@@ -73,7 +73,7 @@ def _infer_datetime_index(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-@register_tool("write_symbol")
+@register_tool("write_symbol", read_only=False)
 def write_symbol(library: str, symbol: str, data: list, metadata: Optional[dict] = None):
     """
     Write data to a symbol, creating a new version.
@@ -88,7 +88,7 @@ def write_symbol(library: str, symbol: str, data: list, metadata: Optional[dict]
     return f"Written {len(df)} rows to '{symbol}'."
 
 
-@register_tool("append_symbol")
+@register_tool("append_symbol", read_only=False)
 def append_symbol(library: str, symbol: str, data: list):
     """
     Append rows to an existing symbol, creating a new version.
@@ -101,7 +101,7 @@ def append_symbol(library: str, symbol: str, data: list):
     return f"Appended {len(df)} rows to '{symbol}'."
 
 
-@register_tool("update_symbol")
+@register_tool("update_symbol", read_only=False)
 def update_symbol(library: str, symbol: str, data: list):
     """
     Overwrite a date range of a timeseries symbol with new data, creating a new version.
@@ -121,7 +121,7 @@ def update_symbol(library: str, symbol: str, data: list):
     return f"Updated '{symbol}' with {len(df)} rows."
 
 
-@register_tool("delete_symbol")
+@register_tool("delete_symbol", read_only=False)
 def delete_symbol(library: str, symbol: str):
     """
     Delete a symbol and all its versions from the library.
@@ -134,7 +134,7 @@ def delete_symbol(library: str, symbol: str):
     return f"Deleted '{symbol}'."
 
 
-@register_tool("delete_data_in_range")
+@register_tool("delete_data_in_range", read_only=False)
 def delete_data_in_range(library: str, symbol: str, start: str, end: str):
     """
     Delete all rows within a date range from a timeseries symbol, creating a new version.
@@ -146,13 +146,13 @@ def delete_data_in_range(library: str, symbol: str, start: str, end: str):
     return f"Deleted data in range {start} to {end} from '{symbol}'."
 
 
-@register_tool("symbol_exists")
+@register_tool("symbol_exists", read_only=True)
 def symbol_exists(library: str, symbol: str):
     """Check whether a symbol exists in the given library."""
     return get_ac()[library].has_symbol(symbol)
 
 
-@register_tool("get_symbol_info")
+@register_tool("get_symbol_info", read_only=True)
 def get_symbol_info(library: str, symbol: str):
     """
     Return descriptive information about a symbol: row count, column names,
@@ -184,7 +184,7 @@ def get_symbol_info(library: str, symbol: str):
     }
 
 
-@register_tool("read_metadata")
+@register_tool("read_metadata", read_only=True)
 def read_metadata(library: str, symbol: str):
     """
     Read only the metadata for a symbol without loading its data.
@@ -194,7 +194,7 @@ def read_metadata(library: str, symbol: str):
     return result.metadata
 
 
-@register_tool("write_metadata")
+@register_tool("write_metadata", read_only=False)
 def write_metadata(library: str, symbol: str, metadata: dict):
     """
     Update the metadata for a symbol without modifying its data.
@@ -204,7 +204,7 @@ def write_metadata(library: str, symbol: str, metadata: dict):
     return f"Metadata updated for '{symbol}'."
 
 
-@register_tool("list_versions")
+@register_tool("list_versions", read_only=True)
 def list_versions(library: str, symbol: str):
     """
     List all versions of a symbol with their version number and write timestamp.

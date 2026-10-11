@@ -105,6 +105,35 @@ You can also use a `.env` file:
 ARCTICDB_URI=lmdb:///path/to/db
 ```
 
+### Read-Only Mode
+
+To connect an assistant for analysis, querying, and reporting without exposing database mutation tools, enable read-only mode by setting `ARCTICDB_MCP_READ_ONLY`:
+
+```bash
+ARCTICDB_URI=lmdb:///path/to/db ARCTICDB_MCP_READ_ONLY=true python -m arcticdb_mcp
+```
+
+Or in your MCP client configuration:
+
+```json
+{
+  "mcpServers": {
+    "arcticdb": {
+      "command": "uvx",
+      "args": ["arcticdb-mcp"],
+      "env": {
+        "ARCTICDB_URI": "lmdb:///path/to/your/database",
+        "ARCTICDB_MCP_READ_ONLY": "true"
+      }
+    }
+  }
+}
+```
+
+- **Accepted values**: `1`, `true`, `yes`, `on` enable read-only mode; `0`, `false`, `no`, `off`, or unset/empty retain the default full tool set. Any other value raises an actionable configuration error.
+- **Tool filtering**: In read-only mode, only the 26 read-only tools (`read_symbol`, `describe`, `query_*`, `list_*`, etc.) are registered and discoverable. All 22 mutating tools (writes, updates, deletes, batch mutations, snapshot creations/deletions, library option changes, and storage compaction/pruning) are excluded from discovery and rejected if called.
+- **Scope note**: `ARCTICDB_MCP_READ_ONLY` controls the operations exposed over the MCP server interface to the assistant. It does not replace backend storage credentials, IAM roles, or database-level authorization policies.
+
 ## Run Modes
 
 ### stdio (default)

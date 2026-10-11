@@ -6,7 +6,7 @@ from ..registry import register_tool
 from ..connection import get_ac
 
 
-@register_tool("query_filter")
+@register_tool("query_filter", read_only=True)
 def query_filter(library: str, symbol: str, filters: list):
     """
     Filter rows using conditions.
@@ -52,7 +52,7 @@ def query_filter(library: str, symbol: str, filters: list):
     return dataframe_to_records(result.data)
 
 
-@register_tool("query_filter_isin")
+@register_tool("query_filter_isin", read_only=True)
 def query_filter_isin(library: str, symbol: str, column: str, values: list):
     """
     Filter rows where column value is in a list.
@@ -64,7 +64,7 @@ def query_filter_isin(library: str, symbol: str, column: str, values: list):
     return dataframe_to_records(result.data)
 
 
-@register_tool("query_groupby")
+@register_tool("query_groupby", read_only=True)
 def query_groupby(library: str, symbol: str, groupby_column: str, aggregations: dict):
     """
     Group by a column and aggregate.
@@ -77,7 +77,7 @@ def query_groupby(library: str, symbol: str, groupby_column: str, aggregations: 
     return dataframe_to_records(result.data)
 
 
-@register_tool("query_date_range")
+@register_tool("query_date_range", read_only=True)
 def query_date_range(library: str, symbol: str, start: str, end: str):
     """
     Filter rows by date range on a datetime-indexed symbol.
@@ -90,7 +90,7 @@ def query_date_range(library: str, symbol: str, start: str, end: str):
     return dataframe_to_records(result.data)
 
 
-@register_tool("query_resample")
+@register_tool("query_resample", read_only=True)
 def query_resample(library: str, symbol: str, rule: str, aggregations: dict):
     """
     Resample a datetime-indexed symbol and aggregate.

@@ -5,7 +5,7 @@ from ..registry import register_tool
 from ..utils.serialization import serialize_batch_entry
 
 
-@register_tool("get_library_options")
+@register_tool("get_library_options", read_only=True)
 def get_library_options(library: str):
     """Return non-enterprise library options."""
     options = get_ac()[library].options()
@@ -18,7 +18,7 @@ def get_library_options(library: str):
     }
 
 
-@register_tool("get_enterprise_options")
+@register_tool("get_enterprise_options", read_only=True)
 def get_enterprise_options(library: str):
     """Return enterprise library options."""
     options = get_ac()[library].enterprise_options()
@@ -28,28 +28,28 @@ def get_enterprise_options(library: str):
     }
 
 
-@register_tool("reload_symbol_list")
+@register_tool("reload_symbol_list", read_only=False)
 def reload_symbol_list(library: str):
     """Force a symbol-list cache reload for a library."""
     get_ac()[library].reload_symbol_list()
     return f"Symbol list cache reloaded for library '{library}'."
 
 
-@register_tool("compact_symbol_list")
+@register_tool("compact_symbol_list", read_only=False)
 def compact_symbol_list(library: str):
     """Compact the symbol list cache into a single key in storage."""
     get_ac()[library].compact_symbol_list()
     return f"Symbol list cache compacted for library '{library}'."
 
 
-@register_tool("prune_previous_versions")
+@register_tool("prune_previous_versions", read_only=False)
 def prune_previous_versions(library: str, symbol: str):
     """Remove all non-snapshotted symbol versions except the latest."""
     get_ac()[library].prune_previous_versions(symbol)
     return f"Pruned previous versions for symbol '{symbol}'."
 
 
-@register_tool("is_symbol_fragmented")
+@register_tool("is_symbol_fragmented", read_only=True)
 def is_symbol_fragmented(
     library: str, symbol: str, segment_size: Optional[int] = None
 ):
@@ -60,7 +60,7 @@ def is_symbol_fragmented(
     return lib.is_symbol_fragmented(symbol, segment_size=segment_size)
 
 
-@register_tool("defragment_symbol_data")
+@register_tool("defragment_symbol_data", read_only=False)
 def defragment_symbol_data(
     library: str,
     symbol: str,

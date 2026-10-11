@@ -10,15 +10,53 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(pkg_path.parent))
     __package__ = pkg_path.name
 
-from .registry import TOOL_REGISTRY
+from typing import Optional
+from .registry import TOOL_REGISTRY, get_tools
 
-mcp = FastMCP("arcticdb-mcp")
+
+def is_read_only_mode() -> bool:
+    """
+    Check if read-only mode is enabled via ARCTICDB_MCP_READ_ONLY environment variable.
+    Returns True for '1', 'true', 'yes', 'on' (case-insensitive).
+    Returns False for '0', 'false', 'no', 'off', or when unset/empty.
+    Raises ValueError for any unrecognized value.
+    """
+    val = os.getenv("ARCTICDB_MCP_READ_ONLY")
+    if val is None or val == "":
+        return False
+    val_clean = val.strip().lower()
+    if val_clean in ("1", "true", "yes", "on"):
+        return True
+    if val_clean in ("0", "false", "no", "off"):
+        return False
+    raise ValueError(
+        f"Invalid ARCTICDB_MCP_READ_ONLY value: {val!r}. "
+        "Expected boolean ('true', 'false', '1', '0')."
+    )
+
 
 # Import tool modules to trigger @register_tool side-effects
 from . import tools as _tools  # noqa: F401
 
-for name, func in TOOL_REGISTRY.items():
-    mcp.tool(name=name)(func)
+
+def register_tools_to_server(server: FastMCP, read_only: bool = False) -> None:
+    """Register tools onto a FastMCP server instance, respecting read_only mode."""
+    tools = get_tools(read_only=read_only)
+    for name, func in tools.items():
+        server.tool(name=name)(func)
+
+
+def create_mcp_server(read_only: Optional[bool] = None) -> FastMCP:
+    """Create and configure a FastMCP server instance with registered tools."""
+    if read_only is None:
+        read_only = is_read_only_mode()
+    server = FastMCP("arcticdb-mcp")
+    register_tools_to_server(server, read_only=read_only)
+    return server
+
+
+mcp = create_mcp_server()
+
 
 
 def _run_http_sse(port: int):
@@ -38,6 +76,7 @@ def _run_http_sse(port: int):
 
 
 def main():
+    is_read_only_mode()
     port = os.getenv("ARCTICDB_MCP_PORT")
     if port:
         try:

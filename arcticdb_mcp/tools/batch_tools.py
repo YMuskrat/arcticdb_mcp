@@ -14,7 +14,7 @@ from ..utils.batch_payloads import (
 from ..utils.serialization import serialize_batch_entry
 
 
-@register_tool("write_batch")
+@register_tool("write_batch", read_only=False)
 def write_batch(
     library: str, payloads: list, prune_previous_versions: bool = False, validate_index=True
 ):
@@ -31,7 +31,7 @@ def write_batch(
     return [serialize_batch_entry(result) for result in results]
 
 
-@register_tool("append_batch")
+@register_tool("append_batch", read_only=False)
 def append_batch(
     library: str,
     append_payloads: list,
@@ -51,7 +51,7 @@ def append_batch(
     return [serialize_batch_entry(result) for result in results]
 
 
-@register_tool("update_batch")
+@register_tool("update_batch", read_only=False)
 def update_batch(
     library: str, update_payloads: list, upsert: bool = False, prune_previous_versions: bool = False
 ):
@@ -67,7 +67,7 @@ def update_batch(
     return [serialize_batch_entry(result) for result in results]
 
 
-@register_tool("delete_batch")
+@register_tool("delete_batch", read_only=False)
 def delete_batch(library: str, delete_requests: list):
     """
     Delete multiple symbols or symbol versions in one call.
@@ -78,7 +78,7 @@ def delete_batch(library: str, delete_requests: list):
     return [serialize_batch_entry(result) for result in results]
 
 
-@register_tool("read_batch")
+@register_tool("read_batch", read_only=True)
 def read_batch(
     library: str, symbols: list, output_format: Optional[str] = None, lazy: bool = False
 ):
@@ -97,7 +97,7 @@ def read_batch(
     return [serialize_batch_entry(result, include_data=True) for result in results]
 
 
-@register_tool("read_metadata_batch")
+@register_tool("read_metadata_batch", read_only=True)
 def read_metadata_batch(library: str, symbols: list):
     """
     Read metadata for multiple symbols in one call.
@@ -108,7 +108,7 @@ def read_metadata_batch(library: str, symbols: list):
     return [serialize_batch_entry(result) for result in results]
 
 
-@register_tool("get_description_batch")
+@register_tool("get_description_batch", read_only=True)
 def get_description_batch(library: str, symbols: list):
     """
     Get schema/description for multiple symbols in one call.
@@ -119,7 +119,7 @@ def get_description_batch(library: str, symbols: list):
     return [serialize_batch_entry(result) for result in results]
 
 
-@register_tool("write_metadata_batch")
+@register_tool("write_metadata_batch", read_only=False)
 def write_metadata_batch(
     library: str, write_metadata_payloads: list, prune_previous_versions: bool = False
 ):
@@ -141,7 +141,7 @@ def write_metadata_batch(
     return [serialize_batch_entry(result) for result in results]
 
 
-@register_tool("write_pickle")
+@register_tool("write_pickle", read_only=False)
 def write_pickle(
     library: str,
     symbol: str,
@@ -161,7 +161,7 @@ def write_pickle(
     return serialize_batch_entry(result)
 
 
-@register_tool("write_pickle_batch")
+@register_tool("write_pickle_batch", read_only=False)
 def write_pickle_batch(library: str, payloads: list, prune_previous_versions: bool = False):
     """
     Write multiple pickle-serializable payloads in one call.
