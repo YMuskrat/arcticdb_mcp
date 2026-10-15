@@ -27,6 +27,93 @@ def read_symbol(library: str, symbol: str, as_of: Optional[int] = None):
     return _df_to_records(result.data)
 
 
+DEFAULT_PAGE_SIZE = 100
+MAX_PAGE_SIZE = 1000
+
+
+@register_tool("read_symbol_page")
+def read_symbol_page(
+    library: str,
+    symbol: str,
+    offset: int = 0,
+    limit: int = DEFAULT_PAGE_SIZE,
+    columns: Optional[list] = None,
+    as_of: Optional[int] = None,
+):
+    """
+    Read a paginated slice of a symbol using backend row slicing and column projection.
+    Returns rows along with the resolved version and pagination continuation metadata.
+
+    Parameters:
+    - library: Name of the library.
+    - symbol: Name of the symbol.
+    - offset: 0-indexed row offset to begin reading from (must be >= 0, default 0).
+    - limit: Number of rows to read (1 <= limit <= 1000, default 100).
+    - columns: Optional list of column names to project; omit to retrieve all columns.
+    - as_of: Optional historical version integer to pin across pagination requests.
+    """
+    if isinstance(offset, bool) or not isinstance(offset, int) or offset < 0:
+        raise ValueError(f"offset must be a non-negative integer, got {offset!r}.")
+
+    if isinstance(limit, bool) or not isinstance(limit, int) or not (1 <= limit <= MAX_PAGE_SIZE):
+        raise ValueError(
+            f"limit must be an integer between 1 and {MAX_PAGE_SIZE}, got {limit!r}."
+        )
+
+    if columns is not None:
+        if not isinstance(columns, (list, tuple)):
+            raise ValueError("columns must be a list of column names or None.")
+        if not all(isinstance(c, str) for c in columns):
+            raise ValueError("columns must be a list of string column names.")
+        columns = list(columns)
+
+    if as_of is not None:
+        if isinstance(as_of, bool) or not isinstance(as_of, int) or as_of < 0:
+            raise ValueError(f"as_of must be a non-negative integer version, got {as_of!r}.")
+
+    ac = get_ac()
+    if not ac.has_library(library):
+        raise ValueError(f"Library '{library}' does not exist.")
+
+    lib = ac[library]
+    if not lib.has_symbol(symbol):
+        raise ValueError(f"Symbol '{symbol}' does not exist in library '{library}'.")
+
+    read_kwargs = {
+        "row_range": (offset, offset + limit),
+    }
+    if columns is not None:
+        read_kwargs["columns"] = columns
+    if as_of is not None:
+        read_kwargs["as_of"] = as_of
+
+    result = lib.read(symbol, **read_kwargs)
+    resolved_version = result.version
+
+    desc = lib.get_description(symbol, as_of=resolved_version)
+    total_rows = desc.row_count if desc and desc.row_count is not None else 0
+
+    records = _df_to_records(result.data)
+    count = len(records)
+    has_more = (offset + count) < total_rows
+    next_offset = (offset + count) if has_more else None
+
+    return {
+        "symbol": symbol,
+        "library": library,
+        "version": resolved_version,
+        "offset": offset,
+        "limit": limit,
+        "count": count,
+        "total_rows": total_rows,
+        "has_more": has_more,
+        "next_offset": next_offset,
+        "columns": [str(c) for c in result.data.columns] if columns is None else columns,
+        "data": records,
+    }
+
+
+
 @register_tool("head_symbol")
 def head_symbol(library: str, symbol: str, n: int = 5):
     """

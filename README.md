@@ -133,7 +133,7 @@ http://localhost:8000/sse
 
 ## Tools
 
-Current server exposes 48 tools.
+Current server exposes 49 tools.
 
 ### Arctic and Libraries
 
@@ -157,6 +157,7 @@ Current server exposes 48 tools.
 | `list_symbols` | `arcticdb_mcp/tools/symbol_tools.py` | List all symbol names stored in the given library. |
 | `symbol_exists` | `arcticdb_mcp/tools/symbol_tools.py` | Check whether a symbol exists in the given library. |
 | `read_symbol` | `arcticdb_mcp/tools/symbol_tools.py` | Read a symbol's full data as row records with index included. |
+| `read_symbol_page` | `arcticdb_mcp/tools/symbol_tools.py` | Read paginated slice of a symbol with backend row-slicing, column projection, and version consistency. |
 | `head_symbol` | `arcticdb_mcp/tools/symbol_tools.py` | Return the first `n` rows of a symbol (default 5). |
 | `tail_symbol` | `arcticdb_mcp/tools/symbol_tools.py` | Return the last `n` rows of a symbol (default 5). |
 | `write_symbol` | `arcticdb_mcp/tools/symbol_tools.py` | Write data to a symbol, creating a new version. |
@@ -212,6 +213,33 @@ Current server exposes 48 tools.
 | `is_symbol_fragmented` | `arcticdb_mcp/tools/maintenance_tools.py` | Check whether compaction would reduce segment count for a symbol. |
 | `defragment_symbol_data` | `arcticdb_mcp/tools/maintenance_tools.py` | Defragment symbol data by compacting fragmented row-sliced segments. |
 | `prune_previous_versions` | `arcticdb_mcp/tools/maintenance_tools.py` | Remove non-snapshotted symbol versions except the latest one. |
+
+### Paginated Symbol Reads
+
+Use `read_symbol_page` to inspect large symbols a page at a time without loading the full dataset into memory or overflowing assistant response context:
+
+- **Parameters**: `library`, `symbol`, `offset` (default 0), `limit` (default 100, max 1000), optional `columns`, optional `as_of`.
+- **Backend Slicing**: Row ranges and column projections are pushed directly to ArcticDB storage engines.
+- **Version Pinning**: The initial page resolves the symbol's version (`version`). Pass `as_of=version` on subsequent pages to guarantee consistent reads across mutations.
+- **Continuation Info**: Each response includes `count`, `total_rows`, `has_more`, and `next_offset`.
+
+#### Two-Page Example
+
+```python
+# Page 1: Read the first 100 rows of symbol AAPL
+page1 = read_symbol_page(library="finance", symbol="AAPL", offset=0, limit=100)
+# Returns: {"version": 2, "offset": 0, "limit": 100, "count": 100, "total_rows": 250, "has_more": True, "next_offset": 100, "data": [...]}
+
+# Page 2: Pin version=2 and use next_offset to fetch the next slice
+page2 = read_symbol_page(
+    library="finance",
+    symbol="AAPL",
+    offset=page1["next_offset"],
+    limit=100,
+    as_of=page1["version"],
+)
+# Returns: {"version": 2, "offset": 100, "limit": 100, "count": 100, "total_rows": 250, "has_more": True, "next_offset": 200, "data": [...]}
+```
 
 ## Example Prompts
 
