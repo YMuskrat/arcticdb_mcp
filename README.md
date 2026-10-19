@@ -252,8 +252,8 @@ page2 = read_symbol_page(
 ## Development
 
 ```bash
-git clone https://github.com/YMuskrat/arcticdb-mcp
-cd arcticdb-mcp
+git clone https://github.com/YMuskrat/arcticdb_mcp
+cd arcticdb_mcp
 pip install -e .
 ```
 
